@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Smart Parking</title>  
+
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css">
+
+    </head>
+
+    <body>
+      
+    <header>  
+    <!-- As a heading -->
+    <nav class="navbar navbar-dark bg-dark shadow-lg">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Smart Parking - Kelompok 13</span>
+      </div>
+    </nav>  
+    </header>
+
+    <main>
+
+    <div class="container-fluid mt-5">
+      <div class="row">
+        <div class="col-xl-6 col-lg-6">
+
+          <div class="card text-bg-light shadow-lg mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-dark text-uppercase fw-semibold">Parking Area</h6>
+              <h7 class="m-0 font-weight-bold text-dark" id="count">Tersedia : 0</h7>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-bordered" width="100%" cellspacing="0">
+                  <thead>
+                      <th>Area</th>
+                      <th>Status</th>
+                  </thead>
+                  <tbody id="area"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+
+          <div class="card text-bg-light shadow-lg mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-dark text-uppercase fw-semibold">Data Logs</h6>
+            </div>
+            <div class="card-body">
+              <div class="table">
+                <table class="table table-bordered compact row-border" id="dataTable" width="100%">
+                  <thead>
+                      <th>Area</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Time</th>
+                  </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+          
+        </div>
+
+      </div>
+      
+    </main>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"></script>
+      <script type="module">
+          // Import the functions you need from the SDKs you need
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+          import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
+        
+          // Your web app's Firebase configuration
+          const firebaseConfig = {
+            apiKey: "AIzaSyD8uQyN-RElG4UhQFqufq5gIjGgim_P-0o",
+            authDomain: "parking-69dc3.firebaseapp.com",
+            databaseURL: "https://parking-69dc3-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "parking-69dc3",
+            storageBucket: "parking-69dc3.appspot.com",
+            messagingSenderId: "642695374038",
+            appId: "1:642695374038:web:760d9ffed85c1a0e11d577"
+          };
+        
+          // Initialize Firebase
+          const app = initializeApp(firebaseConfig);
+
+          // Initialize Realtime Database and get a reference to the service
+          const db = getDatabase(app);
+          
+          $(document).ready(function() {
+
+            const getPark = ref(db, 'area');
+            onValue(getPark, (snapshot) => {
+                const data = snapshot.val();
+                
+                $("#area").html("");
+                
+                $("#count").html("Tersedia : " + data.count);
+
+                $("#area").append("<tr>" + 
+                  "<td> Park 1 </td>" +
+                  "<td>" + data.park1 + "</td>"
+                  + "</tr>")
+                
+                $("#area").append("<tr>" + 
+                "<td> Park 2 </td>" +
+                "<td>" + data.park2 + "</td>"
+                + "</tr>")
+                
+                $("#area").append("<tr>" + 
+                "<td> Park 3 </td>" +
+                "<td>" + data.park3 + "</td>"
+                + "</tr>")
+                          
+            });
+          })
+
+
+          function showLogs(logs){
+            
+            tables.clear();
+            logs.forEach((element, index) => { 
+              var dataSet = [element.area, element.date, element.status, element.time];
+              tables.row.add(dataSet).draw();
+            });
+          }
+
+          $(document).ready(function() {
+            const getLogs = ref(db, 'logs');
+            onValue(getLogs, (snap) => {
+
+              const logs = [];
+              snap.forEach(element => {
+                logs.push(element.val());   
+              }); 
+              
+              showLogs(logs);;
+            });
+          })
+
+          var tables =  $('#dataTable').DataTable({
+            "lengthMenu": [ 5, 10, 20, 50, 75, 100 ],
+          });
+
+        </script>    
+    </body>
+</html>
